@@ -1,0 +1,189 @@
+--[[
+  سكربت "طي يوسف" | MM2 | الإصدار 1.1
+  متوافق مع Kernel Executor
+--]]
+
+-- إعداد الخدمات
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- نافذة السكربت
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+
+-- إطار الدخول
+local EnterFrame = Instance.new("Frame", ScreenGui)
+EnterFrame.Size = UDim2.new(0, 300, 0, 150)
+EnterFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+EnterFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+EnterFrame.BorderSizePixel = 0
+EnterFrame.Active = true
+EnterFrame.Draggable = true
+
+-- ديكور دخول
+local uiCorner = Instance.new("UICorner", EnterFrame)
+uiCorner.CornerRadius = UDim.new(0, 8)
+
+-- كود الدخول
+local validCodes = {
+    ["TEZ YOUSEF"] = true,
+    ["عبدالاله عمي"] = true
+}
+
+local codeBox = Instance.new("TextBox", EnterFrame)
+codeBox.Size = UDim2.new(1, -20, 0, 40)
+codeBox.Position = UDim2.new(0, 10, 0, 20)
+codeBox.PlaceholderText = "أدخل الكود"
+codeBox.Text = ""
+codeBox.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+codeBox.TextColor3 = Color3.new(1, 1, 1)
+
+local confirmBtn = Instance.new("TextButton", EnterFrame)
+confirmBtn.Size = UDim2.new(1, -20, 0, 30)
+confirmBtn.Position = UDim2.new(0, 10, 0, 70)
+confirmBtn.Text = "تشغيل السكربت"
+confirmBtn.BackgroundColor3 = Color3.fromRGB(60, 100, 60)
+confirmBtn.TextColor3 = Color3.new(1,1,1)
+
+-- الزر الصغير (Y) لفتح القائمة
+local MiniBtn = Instance.new("TextButton", ScreenGui)
+MiniBtn.Size = UDim2.new(0, 40, 0, 40)
+MiniBtn.Position = UDim2.new(0, 10, 0.5, -20)
+MiniBtn.Text = "Y"
+MiniBtn.BackgroundColor3 = Color3.fromRGB(70, 90, 120)
+MiniBtn.Visible = false
+MiniBtn.Active = true
+MiniBtn.Draggable = true
+
+local miniUICorner = Instance.new("UICorner", MiniBtn)
+miniUICorner.CornerRadius = UDim.new(1, 0)
+
+-- القائمة الرئيسية
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local mainUICorner = Instance.new("UICorner", MainFrame)
+mainUICorner.CornerRadius = UDim.new(0, 8)
+
+-- زينة داخل القائمة (شريط علوي)
+local titleBar = Instance.new("Frame", MainFrame)
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(60, 70, 100)
+titleBar.BorderSizePixel = 0
+
+local titleLabel = Instance.new("TextLabel", titleBar)
+titleLabel.Size = UDim2.new(1, 0, 1, 0)
+titleLabel.Text = "طي يوسف - قائمة التحكم"
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 16
+
+-- زر كاشف الرتب
+local roleButton = Instance.new("TextButton", MainFrame)
+roleButton.Size = UDim2.new(0, 200, 0, 40)
+roleButton.Position = UDim2.new(0.5, -100, 0.3, 0)
+roleButton.Text = "تفعيل كاشف الرتب"
+roleButton.BackgroundColor3 = Color3.fromRGB(80, 60, 100)
+roleButton.TextColor3 = Color3.new(1,1,1)
+
+-- زر Aim Bot
+local aimButton = Instance.new("TextButton", MainFrame)
+aimButton.Size = UDim2.new(0, 200, 0, 40)
+aimButton.Position = UDim2.new(0.5, -100, 0.5, 0)
+aimButton.Text = "تفعيل Aim Bot"
+aimButton.BackgroundColor3 = Color3.fromRGB(100, 60, 80)
+aimButton.TextColor3 = Color3.new(1,1,1)
+
+-- التحقق من الكود
+confirmBtn.MouseButton1Click:Connect(function()
+    local inputCode = codeBox.Text
+    if validCodes[inputCode] then
+        EnterFrame.Visible = false
+        MiniBtn.Visible = true
+    else
+        confirmBtn.Text = "كود خاطئ!"
+        wait(1)
+        confirmBtn.Text = "تشغيل السكربت"
+    end
+end)
+
+-- فتح القائمة من الزر Y
+MiniBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- كاشف الرتب
+local showRoles = false
+roleButton.MouseButton1Click:Connect(function()
+    showRoles = not showRoles
+    roleButton.Text = showRoles and "إيقاف كاشف الرتب" or "تفعيل كاشف الرتب"
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local head = player.Character and player.Character:FindFirstChild("Head")
+            if showRoles and head and not head:FindFirstChild("RoleTag") then
+                local tag = Instance.new("BillboardGui", head)
+                tag.Size = UDim2.new(0, 100, 0, 30)
+                tag.AlwaysOnTop = true
+                tag.Name = "RoleTag"
+
+                local label = Instance.new("TextLabel", tag)
+                label.Size = UDim2.new(1, 0, 1, 0)
+                label.BackgroundTransparency = 1
+                label.TextColor3 = Color3.new(1, 1, 0)
+                label.Text = "جارٍ التحليل..."
+                label.TextScaled = true
+
+                if player.Backpack:FindFirstChild("Knife") or player.Character:FindFirstChild("Knife") then
+                    label.Text = "قاتل"
+                    label.TextColor3 = Color3.new(1, 0, 0)
+                elseif player.Backpack:FindFirstChild("Gun") or player.Character:FindFirstChild("Gun") then
+                    label.Text = "شرطي"
+                    label.TextColor3 = Color3.new(0, 1, 0)
+                else
+                    label.Text = "مدني"
+                end
+            elseif not showRoles and head and head:FindFirstChild("RoleTag") then
+                head.RoleTag:Destroy()
+            end
+        end
+    end
+end)
+
+-- Aim Bot
+local aimbotEnabled = false
+aimButton.MouseButton1Click:Connect(function()
+    aimbotEnabled = not aimbotEnabled
+    aimButton.Text = aimbotEnabled and "إيقاف Aim Bot" or "تفعيل Aim Bot"
+end)
+
+-- تشغيل Aim Bot
+RunService.RenderStepped:Connect(function()
+    if aimbotEnabled and LocalPlayer.Character then
+        local mouse = LocalPlayer:GetMouse()
+        local target = nil
+        local closest = math.huge
+
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                local head = player.Character.Head
+                local distance = (mouse.Hit.p - head.Position).Magnitude
+                if distance < closest and distance < 50 then
+                    closest = distance
+                    target = head
+                end
+            end
+        end
+
+        if target then
+            mouse.Target = target
+        end
+    end
+end)
